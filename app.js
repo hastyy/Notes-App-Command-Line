@@ -8,20 +8,27 @@ const notes = require('./notes');
 const argv = yargs.argv;
 const command = argv._[0];
 
+let note;   // Needs to be declared here because multiple declarations inside of switch conflict due to block-scope. In alternative, a block could be defined in each case, i.e. case 'something': {...}
 switch (command) {
     case 'list':
-        notes.getAll();
+        const allNotes = notes.getAll();
+        console.log(`Printing ${allNotes.length} note(s).`);
+        allNotes.forEach(note => notes.logNote(note));
         break;
     case 'read':
-        notes.getNote(argv.title);
+        note = notes.getNote(argv.title);
+        if (note) {
+            console.log('Note read');
+            notes.logNote(note);
+        } else {
+            console.log('Note not found');
+        }
         break;
     case 'add':
-        const note = notes.addNote(argv.title, argv.body);
+        note = notes.addNote(argv.title, argv.body);
         if (note) {
             console.log('Note created');
-            console.log('--');
-            console.log('Title:', note.title);
-            console.log('Body:', note.body);
+            notes.logNote(note);
         } else {
             console.log('Note title taken');
         }
